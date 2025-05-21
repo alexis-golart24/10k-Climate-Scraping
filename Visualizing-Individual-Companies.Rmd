@@ -1,0 +1,156 @@
+---
+title: "Visualizing Individual Companies"
+author: "Alexis Golart"
+date: "2025-05-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Libraries
+```{r}
+library(readxl)
+library(tidyr)
+library(ggplot2)
+```
+
+#### Read in Excel Data
+```{r}
+sheet_names <- excel_sheets("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx")
+
+all_sheets <- lapply(sheet_names, function(x) {read_excel("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx", sheet = x)})
+
+names(all_sheets) <- sheet_names
+
+apple_data <- all_sheets[["Apple"]]
+View(apple_data)
+
+```
+
+
+#### Creating Loop per Company
+```{r}
+for(x in 0:2) {  # Changed to 0:2 since you only have 3 conditions
+  if(x == 0) {    # Parentheses around condition and curly braces
+    fill_color <- "lightblue"
+    variable_name <- "Climate Count"  # This should match your column name
+    category <- "Climate"
+  } else if(x == 1) {  # 'else if' instead of 'elif'
+    fill_color <- "orange"
+    variable_name <- "Sustainable Count"  # Match your column name
+    category <- "Sustainable"
+  } else if(x == 2) {
+    fill_color <- "hotpink"
+    variable_name <- "Environmental Count"  # Match your column name
+    category <- "Environmental"
+  }
+  
+  all_years <- as.character(2002:2024)
+
+  # Create plot
+  print(  # Need print() inside loops to display ggplot
+    ggplot(apple_data, aes(x = factor(Year), y = .data[[variable_name]])) +  # Dynamic column reference
+      geom_bar(stat = "identity", 
+               fill = fill_color,  # Use the dynamic color
+               width = 0.6,
+               alpha = 0.9,
+               color = "white",
+               linewidth = 0.3) +
+      scale_x_discrete(limits = all_years, drop = FALSE) +
+      scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +
+      labs(title = paste("Occurrence of", category, "in Apple 10k Forms"),  # Use paste() for string concatenation
+           subtitle = "Annual Frequency (2002-2024)",
+           x = NULL,
+           y = "Count") +
+      theme_minimal(base_size = 13) +
+      theme(
+        plot.title = element_text(hjust = 0.5, face = "bold", size = rel(1.2), margin = margin(b = 8)),
+        plot.subtitle = element_text(hjust = 0.5, color = "gray40", margin = margin(b = 15)),
+        axis.text.x = element_text(angle = 45, hjust = 1, color = "gray30"),
+        axis.text.y = element_text(color = "gray30"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.y = element_line(color = "gray90", linewidth = 0.3),
+        plot.margin = unit(c(1, 1, 1, 1), "cm")
+      )
+  )
+}
+```
+
+
+
+### Iterating through 100?
+```{r}
+library(readxl)
+library(ggplot2)
+library(patchwork)
+
+# 1. Get all sheet names
+sheet_names <- excel_sheets("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx")
+
+# 2. Create directory to save graphs
+output_dir <- "Company_Graphs"
+if(!dir.exists(output_dir)) dir.create(output_dir)
+
+# 3. Process each company sheet
+for(company in sheet_names) {
+  # Read company data
+  company_data <- read_excel("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx", sheet = company)
+  
+  # Initialize list to store this company's 3 plots
+  company_plots <- list()
+  
+  # 4. Generate the 3 graphs (your existing code)
+  for(x in 0:2) {
+    if(x == 0) {
+      fill_color <- "lightblue"
+      variable_name <- "Climate Count"
+      category <- "Climate"
+    } else if(x == 1) {
+      fill_color <- "orange"
+      variable_name <- "Sustainable Count"
+      category <- "Sustainable"
+    } else if(x == 2) {
+      fill_color <- "hotpink"
+      variable_name <- "Environmental Count"
+      category <- "Environmental"
+    }
+    
+    company_plots[[x+1]] <- ggplot(company_data, aes(x = factor(Year), y = .data[[variable_name]])) +
+      geom_bar(stat = "identity", 
+               fill = fill_color,
+               width = 0.6,
+               alpha = 0.9,
+               color = "white",
+               linewidth = 0.3) +
+      scale_x_discrete(limits = as.character(2002:2024), drop = FALSE) +
+      scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +
+      labs(title = paste(category, "Mentions"),
+           subtitle = company,
+           x = NULL,
+           y = ifelse(x == 0, "Count", "")) +
+      theme_minimal(base_size = 11) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  }
+  
+  # 5. Combine and save the 3 plots for this company
+  combined <- wrap_plots(company_plots, nrow = 1)
+  
+  ggsave(
+    file.path(output_dir, paste0(company, "_keyword_analysis.png")),
+    combined,
+    width = 12,
+    height = 4,
+    dpi = 300
+  )
+  
+  # Progress update
+  message("Processed: ", company)
+}
+
+message("All done! Saved 300 graphs to: ", normalizePath(output_dir))
+```
+
+

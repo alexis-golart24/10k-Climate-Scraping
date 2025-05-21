@@ -1,35 +1,27 @@
 ---
-title: "Visualizing Individual Companies"
-author: "Alexis Golart"
-date: "2025-05-21"
-output: html_document
+title: "Visualizing Individual Companies" author: "Alexis Golart" date:
+"2025-05-21" output: html_document
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 #### Libraries
 ```{r}
 # library(readxl)
 # library(tidyr)
 # library(ggplot2)
 ```
-
 #### Read in Excel Data
 ```{r}
 # sheet_names <- excel_sheets("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx")
-# 
+#
 # all_sheets <- lapply(sheet_names, function(x) {read_excel("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx", sheet = x)})
-# 
+#
 # names(all_sheets) <- sheet_names
-# 
+#
 # apple_data <- all_sheets[["Apple"]]
 # View(apple_data)
-
 ```
-
-
 #### Creating Loop per Company
 ```{r}
 # for(x in 0:2) {  # Changed to 0:2 since you only have 3 conditions
@@ -46,13 +38,13 @@ knitr::opts_chunk$set(echo = TRUE)
 #     variable_name <- "Environmental Count"  # Match your column name
 #     category <- "Environmental"
 #   }
-#   
+#
 #   all_years <- as.character(2002:2024)
-# 
+#
 #   # Create plot
 #   print(  # Need print() inside loops to display ggplot
 #     ggplot(apple_data, aes(x = factor(Year), y = .data[[variable_name]])) +  # Dynamic column reference
-#       geom_bar(stat = "identity", 
+#       geom_bar(stat = "identity",
 #                fill = fill_color,  # Use the dynamic color
 #                width = 0.6,
 #                alpha = 0.9,
@@ -78,25 +70,18 @@ knitr::opts_chunk$set(echo = TRUE)
 #   )
 # }
 ```
-
-
-
 ### Iterating through 100?
 ```{r}
 library(readxl)
 library(ggplot2)
-
 # Get first 5 company names
 sheet_names <- excel_sheets("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx")[1:100]
-
 for(company in sheet_names) {
   # Read data (no changes to your original graph code)
-  company_data <- read_excel("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx", 
+  company_data <- read_excel("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx",
                            sheet = company)
-  
   # Print company header
-  cat("\n\n##", company, "\n\n") 
-  
+  cat("\n\n##", company, "\n\n")
   # Your perfect graph code - now with headers for each plot type
   for(x in 0:2) {
     if(x == 0) {
@@ -109,11 +94,10 @@ for(company in sheet_names) {
       fill_color <- "hotpink"
       variable_name <- "Environmental Count"
     }
-    
     # Your exact plotting code
     print(
       ggplot(company_data, aes(x = factor(Year), y = .data[[variable_name]])) +
-        geom_bar(stat = "identity", 
+        geom_bar(stat = "identity",
                  fill = fill_color,
                  width = 0.6,
                  alpha = 0.9,
@@ -131,4 +115,75 @@ for(company in sheet_names) {
 }
 ```
 
+
+## Attempting with a PDF
+```{r}
+library(readxl)
+library(ggplot2)
+library(gridExtra)
+library(grid)
+
+# Create PDF
+pdf("Company_Reports.pdf", width = 11, height = 8.5) # Letter size (landscape)
+
+# Get company names
+sheet_names <- excel_sheets("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx")[1:100]
+
+for(company in sheet_names) {
+  company_data <- read_excel("C:/Users/alexi/Downloads/Processed EDGAR API Links.xlsx", 
+                           sheet = company)
+  
+  # Create a list to store the 3 plots
+  plot_list <- list()
+  
+  # Generate the 3 plots
+  for(x in 0:2) {
+    if(x == 0) {
+      fill_color <- "lightblue"
+      variable_name <- "Climate Count"
+      plot_title <- "Climate Mentions"
+    } else if(x == 1) {
+      fill_color <- "orange"
+      variable_name <- "Sustainable Count"
+      plot_title <- "Sustainable Mentions"
+    } else {
+      fill_color <- "hotpink"
+      variable_name <- "Environmental Count"
+      plot_title <- "Environmental Mentions"
+    }
+    
+    plot_list[[x+1]] <- ggplot(company_data, aes(x = factor(Year), y = .data[[variable_name]])) +
+      geom_bar(stat = "identity", 
+               fill = fill_color,
+               width = 0.6,
+               alpha = 0.9,
+               color = "white",
+               linewidth = 0.3) +
+      scale_x_discrete(limits = as.character(2001:2024), drop = FALSE) +
+      scale_y_continuous(expand = c(0, 0)) +
+      labs(title = plot_title,
+           x = NULL,
+           y = "Count") +
+      theme_minimal(base_size = 10) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1),
+            plot.title = element_text(size = 12, face = "bold"))
+  }
+  
+  # Create company title
+  title_grob <- textGrob(company, gp = gpar(fontsize = 18, fontface = "bold"))
+  
+  # Arrange all elements on one page
+  grid.arrange(
+    title_grob,
+    arrangeGrob(plot_list[[1]], plot_list[[2]], plot_list[[3]], nrow = 1),
+    ncol = 1,
+    heights = c(0.1, 0.9),  # 10% for title, 90% for plots
+    top = textGrob("", gp = gpar(fontsize = 8)), # Small margin at top
+    padding = unit(1, "cm")
+  )
+}
+
+dev.off()
+message("PDF saved with 100 pages (1 company per page)")
+```
 

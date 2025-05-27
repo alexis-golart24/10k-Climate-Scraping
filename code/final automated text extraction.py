@@ -163,7 +163,7 @@ def process_excel_file(file_path):
 
         start_year = most_recent_year
 
-        search_words = ["Climate", "Sustainable", "Environmental"]
+        search_words = ["Climate Change", "Sustainable", "Greenhouse Gasses"]
         context_words = 50
 
         all_data = []

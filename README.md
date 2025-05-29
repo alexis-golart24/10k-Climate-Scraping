@@ -2,14 +2,23 @@
 Analyzing 100+ corporate 10-K filings to identify climate funding trends and global investment disparities.
 
 1. Create dataframe by copying 10k links from Edgar into “Edgar API Links” excel
-  a. Run “final automated text extraction code” 
+
+  a. Run “final automated text extraction code”
+
     I. Update the search words & parameters to extract specific language
+    
   b. Code produces “Processed Edgar API Links” excel sheet with extracted data
-2. Classify companies into divisions by running “Broader company classifications”
-3. Use the division lists from Step C. in the “subsetted and sorted data” code to sort and average your extracted data by division (subsets by division and by years: 2002/2010 start year)
+  
+3. Classify companies into divisions by running “Broader company classifications”
+
+5. Use the division lists from Step C. in the “subsetted and sorted data” code to sort and average your extracted data by division (subsets by division and by years: 2002/2010 start year)
+
   a. This code produces the “Final Grouped Companies” excel file 
-4. You then go to the R code “Visualizing Individual companies”
+  
+7. You then go to the R code “Visualizing Individual companies”
+
   a. Run the very last code chunk “PDFs for Company Divisions”
+  
   b. This produces the PDF with grouped visualizations “Final grouped Company reports”
 
 

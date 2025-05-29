@@ -13,13 +13,13 @@ Analyzing 100+ corporate 10-K filings to identify climate funding trends and glo
 
 3. Use the division lists from Step 2. in the “subsetted and sorted data” code to sort and average your extracted data by division (subsets by division and by years: 2002/2010 start year)
 
-  a. This code produces the “Final Grouped Companies” excel file 
+      a. This code produces the “Final Grouped Companies” excel file 
   
 4. You then go to the R code “Visualizing Individual companies”
 
-  a. Run the very last code chunk “PDFs for Company Divisions”
+      a. Run the very last code chunk “PDFs for Company Divisions”
   
-  b. This produces the PDF with grouped visualizations “Final grouped Company reports”
+      b. This produces the PDF with grouped visualizations “Final grouped Company reports”
 
 
 

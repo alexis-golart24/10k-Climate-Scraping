@@ -3,11 +3,11 @@ Analyzing 100+ corporate 10-K filings to identify climate funding trends and glo
 
 1. Create dataframe by copying 10k links from Edgar into “Edgar API Links” excel
 
-  a. Run “final automated text extraction code”
+  I. Run “final automated text extraction code”
 
-    I. Update the search words & parameters to extract specific language
+  II. Update the search words & parameters to extract specific language
     
-  b. Code produces “Processed Edgar API Links” excel sheet with extracted data
+  III. Code produces “Processed Edgar API Links” excel sheet with extracted data
   
 3. Classify companies into divisions by running “Broader company classifications”
 

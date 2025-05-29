@@ -3,19 +3,19 @@ Analyzing 100+ corporate 10-K filings to identify climate funding trends and glo
 
 1. Create dataframe by copying 10k links from Edgar into “Edgar API Links” excel
 
-    I. Run “final automated text extraction code”
+    a. Run “final automated text extraction code”
 
-    II. Update the search words & parameters to extract specific language
+    b. Update the search words & parameters to extract specific language
     
-    III. Code produces “Processed Edgar API Links” excel sheet with extracted data
+    c. Code produces “Processed Edgar API Links” excel sheet with extracted data
   
-3. Classify companies into divisions by running “Broader company classifications”
+2. Classify companies into divisions by running “Broader company classifications”
 
-5. Use the division lists from Step C. in the “subsetted and sorted data” code to sort and average your extracted data by division (subsets by division and by years: 2002/2010 start year)
+3. Use the division lists from Step 2. in the “subsetted and sorted data” code to sort and average your extracted data by division (subsets by division and by years: 2002/2010 start year)
 
   a. This code produces the “Final Grouped Companies” excel file 
   
-7. You then go to the R code “Visualizing Individual companies”
+4. You then go to the R code “Visualizing Individual companies”
 
   a. Run the very last code chunk “PDFs for Company Divisions”
   
@@ -36,7 +36,7 @@ Analyzing 100+ corporate 10-K filings to identify climate funding trends and glo
 ### Data:
 - Edgar_API_Links.xlsx: original 100 Edgar links
 - Edgar_API_Links(100+).xlsx: Currently being updated, expanded database to use
-- Processed_Edgar_API_Links.xlsx: Extracted data from Edgar API Links, sorted by division and year in steps C. and D. 
+- Processed_Edgar_API_Links.xlsx: Extracted data from Edgar API Links, sorted by division and year in steps 1. and 2. 
 - SIC_Codes.xlsx: Sorts companies on using SIC groupings (broad and narrow sorting but we use the broad “SIC Sorted Divisions” Sheet of the excel
 - Final_Grouped_Companies.xlsx: Final averaged/sorted data that’s used in visualizations code
 

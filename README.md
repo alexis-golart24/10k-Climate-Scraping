@@ -9,7 +9,7 @@ Analyzing 100+ corporate 10-K filings to identify climate funding trends and glo
     
     c. Code produces “Processed Edgar API Links” excel sheet with extracted data
    
-   **check to make sure the companies are in the SIC key codes excel file with their corresponding industry number - if not, add them because its needed for step 3
+       **check to make sure the companies are in the SIC key codes excel file with their corresponding industry number - if not, add them because it's needed for step 3
   
 3. Classify companies into divisions by running “Broader company classifications”
 

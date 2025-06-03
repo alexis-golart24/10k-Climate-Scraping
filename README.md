@@ -8,14 +8,16 @@ Analyzing 100+ corporate 10-K filings to identify climate funding trends and glo
     b. Update the search words & parameters to extract specific language
     
     c. Code produces “Processed Edgar API Links” excel sheet with extracted data
+   
+   **check to make sure the companies are in the SIC key codes excel file with their corresponding industry number - if not, add them because its needed for step 3
   
-2. Classify companies into divisions by running “Broader company classifications”
+3. Classify companies into divisions by running “Broader company classifications”
 
-3. Use the division lists from Step 2. in the “subsetted and sorted data” code to sort and average your extracted data by division (subsets by division and by years: 2002/2010 start year)
+4. Use the division lists from Step 2. in the “subsetted and sorted data” code to sort and average your extracted data by division (subsets by division and by years: 2002/2010 start year)
 
       a. This code produces the “Final Grouped Companies” excel file 
   
-4. You then go to the R code “Visualizing Individual companies”
+5. You then go to the R code “Visualizing Individual companies”
 
       a. Run the very last code chunk “PDFs for Company Divisions”
   

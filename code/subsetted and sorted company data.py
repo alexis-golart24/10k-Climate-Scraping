@@ -3,14 +3,20 @@ from openpyxl import load_workbook
 import os
 
 
+import pandas as pd
+from openpyxl import load_workbook
+import os
+
+
 def aggregate_company_data(excel_file, company_list, data_column, year_column="Year"):
     """
     Returns a DataFrame with yearly totals and counts of companies reporting data.
-    NO DIVISION is performed here.
+    Now also prints which companies reported data each year.
     """
     xls = pd.ExcelFile(excel_file)
     yearly_totals = {}
     yearly_counts = {}
+    yearly_companies = {}
 
     for company in company_list:
         if company in xls.sheet_names:
@@ -30,9 +36,16 @@ def aggregate_company_data(excel_file, company_list, data_column, year_column="Y
                 if year in yearly_totals:
                     yearly_totals[year] += value
                     yearly_counts[year] += 1
+                    yearly_companies[year].append(company)
                 else:
                     yearly_totals[year] = value
                     yearly_counts[year] = 1
+                    yearly_companies[year] = [company]
+
+    # New: Print reporting companies by year
+    print(f"\nCompanies reporting '{data_column}' by year:")
+    for year in sorted(yearly_companies.keys()):
+        print(f"{year}: {', '.join(yearly_companies[year])}")
 
     result = pd.DataFrame(
         {"total": yearly_totals, "count": yearly_counts}, index=yearly_totals.keys()
@@ -42,23 +55,24 @@ def aggregate_company_data(excel_file, company_list, data_column, year_column="Y
 
 
 def process_group(group_name, company_list, topics, excel_file, output_file, mode):
-    print(f"\nProcessing group: {group_name}")
+    print(f"\n{'='*50}")
+    print(f"Processing group: {group_name}")
+    print(f"Companies in division: {', '.join(company_list)}")
     all_results = {}
 
     for topic_info in topics:
         topic = topic_info["topic"]
         column = topic_info["column"]
+        print(f"\nTopic: {topic}")
 
-        print(f"Processing {topic}...")
         result = aggregate_company_data(
             excel_file=excel_file, company_list=company_list, data_column=column
         )
 
         if not result.empty:
-            # SINGLE DIVISION: total / count (companies reporting that year)
             result[column] = result["total"] / result["count"]
             result[column] = round(result[column], 2)
-            all_results[topic] = result[[column]]  # Keep only the averaged column
+            all_results[topic] = result[[column]]
 
     if all_results:
         final_result = pd.concat(all_results.values(), axis=1)
@@ -66,10 +80,9 @@ def process_group(group_name, company_list, topics, excel_file, output_file, mod
             output_file, engine="openpyxl", mode=mode, if_sheet_exists="replace"
         ) as writer:
             final_result.to_excel(writer, sheet_name=group_name)
-            print(f"Saved results to sheet: {group_name}")
+            print(f"\nSaved results to sheet: {group_name}")
 
 
-# Configuration
 topics = [
     {"topic": "climate change", "column": "climate change Count"},
     {"topic": "sustainable", "column": "sustainable Count"},
@@ -206,6 +219,6 @@ for group_name, company_list in company_lists.items():
         output_file=output_file,
         mode=mode,
     )
-    mode = "a"  # Ensure append mode for subsequent groups
+    mode = "a"
 
 print("\nAll processing complete!")

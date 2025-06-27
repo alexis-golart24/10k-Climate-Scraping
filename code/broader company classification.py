@@ -1,68 +1,60 @@
 import openpyxl
+from collections import defaultdict
 
+# Load workbook and first sheet
+file_path = "C:/Users/alexi/OneDrive/Comp sci/ML/Climate Research/SIC_codes.xlsx"
 
-def process_excel_column_to_E(
-    file_path,
-    variable1="Variable1",
-    variable2="Variable2",
-    variable3="Variable3",
-    variable4="Variable4",
-    variable5="Variable5",
-    variable6="Variable6",
-    variable7="Variable7",
-    variable8="Variable8",
-    variable9="Variable9",
-):
+workbook = openpyxl.load_workbook(file_path)
+sheet = workbook.worksheets[0]  # First sheet
 
-    wb = openpyxl.load_workbook(file_path)
-    sheet = wb.worksheets[0]
+# Define number ranges and group labels
+ranges = {
+    "Division B: Mining": (1011, 1499),
+    "Division C: Construction": (1521, 1799),
+    "Division D: Manufacturing": (2000, 3999),
+    "Division E: Transportation, Communications, Electric, Gas, And Sanitary Services": (
+        4011,
+        4971,
+    ),
+    "Division F: Wholesale Trade": (5012, 5199),
+    "Division G: Retail Trade": (5211, 5999),
+    "Division H: Finance, Insurance, And Real Estate": (6011, 6799),
+    "Division I: Services": (7011, 8999),
+    "Division J: Public Administration": (9111, 9999),
+}
 
-    if sheet["E1"].value is None:
-        sheet["E1"] = "SIC Sorted Divisions "
+# Collect grouped names
+grouped_names = defaultdict(list)
 
-    for row in range(2, sheet.max_row + 1):
-        original_value = sheet[f"B{row}"].value
+for row in range(2, sheet.max_row + 1):
+    name = sheet[f"A{row}"].value
+    num = sheet[f"B{row}"].value
 
-        try:
-            num_value = float(original_value)
-            if 1011 <= num_value <= 1499:
-                sheet[f"E{row}"] = variable1
-            elif 1521 <= num_value <= 1799:
-                sheet[f"E{row}"] = variable2
-            elif 2000 <= num_value <= 3999:
-                sheet[f"E{row}"] = variable3
-            elif 4011 <= num_value <= 4971:
-                sheet[f"E{row}"] = variable4
-            elif 5012 <= num_value <= 5199:
-                sheet[f"E{row}"] = variable5
-            elif 5211 <= num_value <= 5999:
-                sheet[f"E{row}"] = variable6
-            elif 6011 <= num_value <= 6799:
-                sheet[f"E{row}"] = variable7
-            elif 7011 <= num_value <= 8999:
-                sheet[f"E{row}"] = variable8
-            elif 9111 <= num_value <= 9999:
-                sheet[f"E{row}"] = variable9
-            else:
+    if name is None or num is None:
+        continue
 
-                sheet[f"E{row}"] = "Other"
-        except (ValueError, TypeError):
+    try:
+        num_value = float(num)
+        for label, (low, high) in ranges.items():
+            if low <= num_value <= high:
+                grouped_names[label].append(str(name))
+                break
+    except ValueError:
+        continue
 
-            sheet[f"E{row}"] = "Invalid"
+# Create new sheet for results
+if "Grouped Results" in workbook.sheetnames:
+    del workbook["Grouped Results"]
+output_sheet = workbook.create_sheet("Grouped Results")
 
-    wb.save(file_path)
-    print(f"Successfully processed {sheet.max_row-1} rows in {file_path}")
+# Write results to new sheet
+for i, (label, names) in enumerate(grouped_names.items(), start=1):
+    output_sheet.cell(row=i, column=1, value=label)
+    output_sheet.cell(row=i, column=2, value=len(names))
+    output_sheet.cell(row=i, column=3, value=", ".join(names))
 
-
-process_excel_column_to_E(
-    "C:/Users/alexi/OneDrive/Comp sci/ML/Climate Research/SIC_codes.xlsx",
-    variable1="Division B: Mining",
-    variable2="Division C: Construction",
-    variable3="Division D: Manufacturing",
-    variable4="Division E: Transportation, Communications, Electric, Gas, And Sanitary Services",
-    variable5="Division F: Wholesale Trade",
-    variable6="Division G: Retail Trade",
-    variable7="Division H: Finance, Insurance, And Real Estate",
-    variable8="Division I: Services",
-    variable9="Division J: Public Administration",
+# Save the workbook
+workbook.save(file_path)
+print(
+    f"Grouped results written to 'Grouped Results' with counts and names in {file_path}"
 )

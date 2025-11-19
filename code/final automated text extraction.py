@@ -163,7 +163,28 @@ def process_excel_file(file_path):
 
         start_year = most_recent_year
 
-        search_words = ["climate change", "sustainable", "greenhouse gas"]
+        search_words = [
+            "artificial intelligence",
+            "AI",
+            "machine learning",
+            "data protection",
+            "data privacy",
+            "data transfer",
+            "cybersecurity",
+            "data security",
+            "data center",
+            "DORA",
+            "Digital Operational Resilience Act",
+            "GDPR",
+            "General Data Protection Regulation",
+            "DMA",
+            "Digital Markets Act",
+            "DSA",
+            "Digital Services Act",
+            "AI Act",
+            "EU AI Act",
+            "DMCC",
+        ]
         context_words = 50
 
         all_data = []

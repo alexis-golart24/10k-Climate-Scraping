@@ -1,0 +1,154 @@
+---
+title: "Division Visualizations (306)"
+author: "Alexis Golart"
+date: "2026-03-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 7
+)
+```
+
+```{r}
+
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(patchwork)
+library(scales)
+library(stringr)
+library(viridis)
+```
+
+### Individual Division Visuals 
+```{r}
+file_path <- "/Users/alexi/Downloads/308_companies_by_division.xlsx"
+sheet_names <- excel_sheets(file_path)
+
+for (sheet in sheet_names) {
+  
+  # Read one division
+  df <- read_excel(file_path, sheet = sheet)
+  
+  # Clean names a little for prettier titles
+  nice_names <- names(df)
+  nice_names[-1] <- str_to_title(nice_names[-1])
+  names(df) <- nice_names
+  
+  # Long format
+  df_long <- df %>%
+    pivot_longer(
+      cols = -Year,
+      names_to = "Word",
+      values_to = "Count"
+    )
+  
+  # unique words/categories
+  words <- unique(df_long$Word)
+  
+  # choose a nice palette
+  pal <- viridis(length(words), option = "D", end = 0.9)
+  
+  # make one graph per word
+  plot_list <- vector("list", length(words))
+  
+  for (i in seq_along(words)) {
+    w <- words[i]
+    
+    p <- df_long %>%
+      filter(Word == w) %>%
+      ggplot(aes(x = Year, y = Count)) +
+      geom_area(fill = pal[i], alpha = 0.25) +
+      geom_line(color = pal[i], linewidth = 1.1) +
+      geom_point(color = pal[i], size = 1.8) +
+      scale_x_continuous(breaks = pretty_breaks(n = 6)) +
+      labs(
+        title = w,
+        x = NULL,
+        y = "Count"
+      ) +
+      theme_minimal(base_size = 11) +
+      theme(
+        plot.title = element_text(face = "bold", size = 11, hjust = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.margin = margin(6, 6, 6, 6)
+      )
+    
+    plot_list[[i]] <- p
+  }
+  
+  # Title for the page
+  page_title <- ggplot() +
+    annotate("text", x = 0, y = 0, label = sheet,
+             size = 7, fontface = "bold", hjust = 0.5) +
+    theme_void()
+  
+  # combine onto one page
+  combined_plot <- wrap_plots(plot_list, ncol = 2) +
+    plot_annotation(title = sheet) &
+    theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+    )
+  
+  print(combined_plot)
+  
+}
+```
+
+
+
+### Grouped Industry Visuals 
+```{r}
+division_data <- lapply(sheet_names, function(sheet) {
+  read_excel(file_path, sheet = sheet) %>%
+    mutate(Division = sheet)
+})
+
+# combine all sheets
+all_divisions <- bind_rows(division_data)
+
+# reshape to long format
+plot_data <- all_divisions %>%
+  pivot_longer(
+    cols = -c(Year, Division),
+    names_to = "Word",
+    values_to = "Count"
+  )
+
+# get unique words
+word_list <- unique(plot_data$Word)
+
+# make one graph per word
+for (w in word_list) {
+  p <- plot_data %>%
+    filter(Word == w) %>%
+    ggplot(aes(x = Year, y = Count, color = Division)) +
+    geom_line(linewidth = 1) +
+    geom_point(size = 2) +
+    labs(
+      title = paste("Counts of", w, "Across Divisions Over Time"),
+      x = "Year",
+      y = "Count",
+      color = "Division"
+    ) +
+    theme_minimal()
+
+  print(p)
+  cat('<div style="page-break-after: always;"></div>')
+  
+}
+```
+
+
+
+
